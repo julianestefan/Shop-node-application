@@ -12,5 +12,8 @@
     "Shop"
   ],
   "author": "Julian Estefan",
-  "license": "SEE LICENSE IN README.txt"
+  "license": "SEE LICENSE IN README.txt",
+  "dependencies": {
+    "nodemon": "^1.18.10"
+  }
 }
