@@ -1,0 +1,16 @@
+{
+  "name": "shop-node-application",
+  "version": "1.0.0",
+  "description": "This is an application created as an assigment for the \"NodeJS. The complete guide\" udemy course.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Course",
+    "Assigment",
+    "Shop"
+  ],
+  "author": "Julian Estefan",
+  "license": "SEE LICENSE IN README.txt"
+}
