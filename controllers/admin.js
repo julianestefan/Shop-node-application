@@ -31,18 +31,13 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 exports.postEditProduct = (req, res, next) => {
-  const prodId = req.body.productId;
-  const updatedTitle = req.body.title;
-  const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.imageUrl;
-  const updatedDesc = req.body.description;
-  const updatedProduct = new Product(
-    prodId,
-    updatedTitle,
-    updatedImageUrl,
-    updatedDesc,
-    updatedPrice
-  );
+  const updatedProduct = new Product(req.body.productId, req.body.title, req.body.imageUrl, req.body.description, req.body.price);
+  updatedProduct.save();
+  res.redirect('/admin/products');
+};
+
+exports.postEditProduct = (req, res, next) => {
+  const updatedProduct = new Product(req.body.productId, req.body.title, req.body.imageUrl, req.body.description, req.body.price);
   updatedProduct.save();
   res.redirect('/admin/products');
 };
