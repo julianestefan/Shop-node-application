@@ -21,14 +21,17 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.getProduct = (req, res, next) => {
-    const prodId = req.params.productId;
-    Product.findById(prodId, product => {
-        if (product) {
+    const productId = req.params.id;
+    Product.findById(productId, prod =>{
+        if (prod){
             res.render('shop/product-detail', {
-                product: product,
-                pageTitle: product.title,
+                product:  prod,
+                pageTitle: prod.title,
                 path: '/products'
             });
+        } else {
+            res.redirect('/invalid');
         }
-    });
-};
+        
+    })
+}
