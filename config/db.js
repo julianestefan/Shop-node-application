@@ -17,30 +17,29 @@ const instancePath = path.join(
 const connectDB = (callback) => {
     fs.readFile(instancePath, (error, content) => {
         const instance = JSON.parse(content);
-        const url = "mongodb+srv://" + instance.mongodb.user + ":" + instance.password + "@demo-shop-app-kpxyo.mongodb.net/test?retryWrites=true";
+        const url = "mongodb+srv://" + instance.mongodb.user + ":" + instance.mongodb.password + "@" + instance.mongodb.host + "?retryWrites=true";
 
-        mongoose.connect(
-            'mongodb+srv://julian:oqEC5KHbVKq3UB50@cluster0-djpkj.mongodb.net/test?retryWrites=true',
-            { useNewUrlParser: true }
-        ).then(client => {
-            User.findOne().then(user => {
-                if (!user) {
-                    const user = new User({
-                        name: 'Julian',
-                        email: 'julian.y.estefan@gmail.com',
-                        cart: {
-                            items: []
-                        }
-                    });
-                    user.save();
-                }
+        mongoose.connect(url, { useNewUrlParser: true })
+            .then(client => {
+                User.findOne().then(user => {
+                    if (!user) {
+                        const user = new User({
+                            name: 'Julian',
+                            email: 'julian.y.estefan@gmail.com',
+                            cart: {
+                                items: []
+                            }
+                        });
+                        user.save();
+                    }
+                });
+                callback();
+                console.log('Database connection established');
+            })
+            .catch(err => {
+                console.log(err);
             });
-            callback();
-        }).catch(err => {
-            console.log(err);
-        });
     })
-
 }
 
 module.exports = connectDB;

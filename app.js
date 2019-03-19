@@ -7,7 +7,6 @@ const bodyParser = require('body-parser');
 
 const connectDB = require('./config/db');
 const errorController = require('./controllers/error');
-const User = require('./models/user');
 
 const app = express();
 
@@ -25,6 +24,6 @@ app.use(shopRoutes); */
 
 app.use(errorController.get404);
 
-connectDB( () => {
-  app.listen(3000);
-})
+connectDB(() => { app.listen(3000); })
+
+
