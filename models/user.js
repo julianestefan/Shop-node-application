@@ -25,11 +25,8 @@ const userSchema = new Schema({
   }
 });
 
-userSchema.methods.addToCart = function(product) {
-  console.log(this.cart.items);
-  const cartProductIndex = this.cart.items.findIndex(cp => {
-    return cp.productId.toString() === product._id.toString();
-  });
+userSchema.methods.addToCart = function (product) {
+  const cartProductIndex = this.cart.items.findIndex(cp => cp.productId.toString() === product._id.toString());
   let newQuantity = 1;
   const updatedCartItems = [...this.cart.items];
 
@@ -43,10 +40,33 @@ userSchema.methods.addToCart = function(product) {
     });
   }
 
-  const updatedCart = {items: updatedCartItems};
-  this.cart = updatedCart;
+  this.cart = { items: updatedCartItems };
   return this.save();
 };
 
+userSchema.methods.removeOneFromCart = function (productId) {
+  const cartProductIndex = this.cart.items.findIndex(cp => cp.productId.toString() === productId.toString());
+  if (cartProductIndex === -1) return;
+
+  const newQuantity = this.cart.items[cartProductIndex].quantity - 1;
+  let updatedCartItems = null;
+  if (newQuantity) {
+    updatedCartItems = [...this.cart.items];
+    updatedCartItems[cartProductIndex].quantity = newQuantity;
+  } else {
+    updatedCartItems = [...this.cart.items.filter(item => item.productId.toString() !== productId.toString())];
+  }
+
+  this.cart = { items: updatedCartItems };
+  return this.save();
+}
+
+userSchema.methods.removeAllFromCart = function (productId) {
+  const updatedCartItems = this.cart.items.filter(item => {
+    return item.productId.toString() !== productId.toString();
+  });
+  this.cart.items = updatedCartItems;
+  return this.save();
+};
 
 module.exports = mongoose.model('User', userSchema);
