@@ -8,7 +8,6 @@ const errorController = require('../controllers/error');
 
 const configureRoutes = (app) => {
     app.use(bodyParser.urlencoded({ extended: false }));
-
     app.use('/admin', adminRoutes);
     app.use(shopRoutes);
     app.use(authRoutes);

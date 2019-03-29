@@ -1,18 +1,11 @@
 "use strict";
 
 const fs = require('fs');
-const path = require('path');
 
 const mongoose = require('mongoose');
 
 const User = require('../models/user');
-
-
-const instancePath = path.join(
-    path.dirname(process.mainModule.filename),
-    'config',
-    'instance.json'
-);
+const instancePath = require('../util/paths').instancePath;
 
 const connectDB = (callback) => {
     fs.readFile(instancePath, (error, content) => {
