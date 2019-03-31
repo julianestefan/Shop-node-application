@@ -1,19 +1,18 @@
 "use strict";
-
 const express = require('express');
 
 const connectDB = require('./config/db');
-const configureSession = require('./config/session');
-const configureRoutes = require('./routes/routes');
+const setViewEngine = require('./views/views');
+const setSession = require('./config/session');
+const setRoutes = require('./routes/routes');
 const publicPath = require('./util/paths').publicPath;
 
 const app = express();
 
-app.set('view engine', 'ejs');
-app.set('views', 'views');
 app.use(express.static(publicPath));
-configureSession(app);
-configureRoutes(app);
+setViewEngine(app, 'ejs', 'views');
+setSession(app);
+setRoutes(app);
 
 connectDB(() => app.listen(3000));
 
