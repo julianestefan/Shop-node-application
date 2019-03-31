@@ -11,11 +11,14 @@ const publicPath = require('./util/paths').publicPath;
 
 const app = express();
 
-
 app.use(express.static(publicPath));
 setViewEngine(app, 'ejs', 'views');
 setSession(app);
 app.use(flash());
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isLoggedIn;
+    next();
+});
 setRoutes(app);
 
 connectDB(() => app.listen(3000));

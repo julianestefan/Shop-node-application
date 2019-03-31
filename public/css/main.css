@@ -241,3 +241,21 @@ form {
     display: none;
   }
 }
+
+.user-message {
+  margin: auto;
+  width: 90%;
+  border: 1px solid #4771fa;
+  padding: 0.5rem;
+  border-radius: 3px;
+  background: #b9c9ff;
+  text-align: center;
+  margin: 0 auto;
+  width: 50%;
+}
+
+.user-message--error {
+  border-color: brown;
+  background: #00695c;
+  color: rgb(207, 176, 176);
+}
