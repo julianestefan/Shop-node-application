@@ -31,7 +31,6 @@ exports.getSignup = (req, res, next) => {
   });
 };
 
-
 exports.postLogin = (req, res, next) => {
   User.findOne({ email: req.body.email })
     .then(user => {
