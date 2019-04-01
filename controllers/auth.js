@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const flash = require('connect-flash');
 
 const User = require('../models/user');
 
@@ -27,11 +28,12 @@ exports.getSignup = (req, res, next) => {
     path: '/signup',
     pageTitle: 'Signup',
     errorMessage: message,
-    isAuthenticated: false
   });
 };
 
 exports.postLogin = (req, res, next) => {
+  console.log(req);
+
   User.findOne({ email: req.body.email })
     .then(user => {
       if (!user) {
