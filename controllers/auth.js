@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const mailTransporter = require('../config/mail');
+const emailMessages = require('../util/emails');
 const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
@@ -76,12 +78,7 @@ exports.postSignup = async (req, res, next) => {
         .then(result => {
           console.log("User created");
           res.redirect('/login');
-          return mailTransporter.sendMail({
-            to: email,
-            from: 'shop@node-complete.com',
-            subject: 'Signup succeeded!',
-            html: '<h1>You successfully signed up!</h1>'
-          });
+          return mailTransporter.sendMail( emailMessages.createdUser(email) );
         })
         .catch(err => {
           console.log(err);
@@ -111,7 +108,30 @@ exports.getReset = (req, res, next) => {
 };
 
 exports.postReset = (req, res, next) => {
-
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      console.log(err);
+      return res.redirect('/reset');
+    }
+    const token = buffer.toString('hex');
+    User.findOne({ email: req.body.email })
+      .then(user => {
+        if (!user) {
+          req.flash('error', 'No account with that email found.');
+          return res.redirect('/reset');
+        }
+        user.resetToken = token;
+        user.resetTokenExpiration = Date.now() + 3600000;
+        return user.save();
+      })
+      .then(result => {
+        res.redirect('/');
+        mailTransporter.sendMail( emailMessages.newPasswordRequest(req.body.email, token) );
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  });
 };
 
 exports.getNewPassword = (req, res, next) => {
