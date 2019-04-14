@@ -140,7 +140,7 @@ exports.getNewPassword = (req, res, next) => {
   User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } })
     .then(user => {
       if (!user) {
-        req.flash('error', 'An error has occurred, Please ask for a new link') 
+        req.flash('error', 'An error has occurred, Please ask for a new link')
         res.redirect('/reset');
       }
       let message = req.flash('error');
@@ -159,6 +159,20 @@ exports.getNewPassword = (req, res, next) => {
     });
 };
 
-exports.postNewPassword = (req, res, next) => {
-
+exports.postNewPassword = async (req, res, next) => {
+  try {
+    const user = await User.findOne({
+      resetToken: req.body.passwordToken,
+      resetTokenExpiration: { $gt: Date.now() },
+      _id: req.body.userId
+    });
+    const hashedPassword = await bcrypt.hash(req.body.password, 12);
+    user.password = hashedPassword;
+    user.resetToken = undefined;
+    user.resetTokenExpiration = undefined;
+    await user.save();
+    res.redirect('/login');
+  } catch (error) {
+    console.log(err);
+  }
 };
