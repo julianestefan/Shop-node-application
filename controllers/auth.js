@@ -5,11 +5,8 @@ const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash('error');
-  if (message.length > 0) {
-    message = message[0];
-  } else {
-    message = null;
-  }
+  message = message.length > 0 ?  message[0] : null ;
+
   res.render('auth/login', {
     path: '/login',
     pageTitle: 'Login',
@@ -19,11 +16,8 @@ exports.getLogin = (req, res, next) => {
 
 exports.getSignup = (req, res, next) => {
   let message = req.flash('error');
-  if (message.length > 0) {
-    message = message[0];
-  } else {
-    message = null;
-  }
+  message = message.length > 0 ?  message[0] : null ;
+
   res.render('auth/signup', {
     path: '/signup',
     pageTitle: 'Signup',
@@ -103,4 +97,27 @@ exports.postLogout = (req, res, next) => {
     console.log(err);
     res.redirect('/');
   });
+};
+
+exports.getReset = (req, res, next) => {
+  let message = req.flash('error');
+  message = message.length > 0 ?  message[0] : null ;
+
+  res.render('auth/reset', {
+    path: '/reset',
+    pageTitle: 'Reset Password',
+    errorMessage: message
+  });
+};
+
+exports.postReset = (req, res, next) => {
+
+};
+
+exports.getNewPassword = (req, res, next) => {
+
+};
+
+exports.postNewPassword = (req, res, next) => {
+
 };
