@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 
-const mailTransport = require('../config/mail');
+const mailTransporter = require('../config/mail');
 const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
@@ -80,8 +80,9 @@ exports.postSignup = async (req, res, next) => {
           return user.save();
         })
         .then(result => {
+          console.log("User created");
           res.redirect('/login');
-          return transporter.sendMail({
+          return mailTransporter.sendMail({
             to: email,
             from: 'shop@node-complete.com',
             subject: 'Signup succeeded!',
