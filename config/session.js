@@ -1,16 +1,12 @@
 "use strict";
-const fs = require('fs');
-
 const session = require('express-session');
-const MongoDBStore = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
+const MongoDBStore = require('connect-mongodb-session')(session);
 
 const User = require('../models/user');
-const instancePath = require('../util/paths').instancePath;
 
 const configureSessions = (app) => {
-  const instance = JSON.parse(fs.readFileSync(instancePath));
-  const uri = "mongodb+srv://" + instance.mongodb.user + ":" + instance.mongodb.password + "@" + instance.mongodb.host + "?retryWrites=true";
+  const uri = "mongodb+srv://" + process.env.MONGO_USER + ":" + process.env.MONGO_PASSWORD + "@" + process.env.MONGO_HOST + "?retryWrites=true";
 
   const store = new MongoDBStore({ uri: uri, collection: 'sessions' });
   const csrfProtection = csrf();

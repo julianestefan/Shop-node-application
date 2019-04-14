@@ -18,6 +18,6 @@ setViewEngine(app, 'ejs', 'views');
 setSession(app);
 setRoutes(app);
 
-connectDB(() => app.listen(3000));
+connectDB(() => app.listen(process.env.PORT));
 
 
