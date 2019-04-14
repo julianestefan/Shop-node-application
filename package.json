@@ -25,6 +25,8 @@
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "mongoose": "^5.4.19",
+    "nodemailer": "^6.1.0",
+    "nodemailer-sendgrid-transport": "^0.2.0",
     "save": "^2.3.3"
   },
   "devDependencies": {

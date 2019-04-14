@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
-const flash = require('connect-flash');
 
+const mailTransport = require('../config/mail');
 const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
@@ -61,16 +61,16 @@ exports.postLogin = (req, res, next) => {
     .catch(err => console.log(err));
 };
 
-exports.postSignup = (req, res, next) => {
+exports.postSignup = async (req, res, next) => {
   const email = req.body.email;
+
   User.findOne({ email: email })
     .then(userDoc => {
       if (userDoc) {
         req.flash('error', 'E-Mail exists already, please pick a different one.');
         return res.redirect('/signup');
       }
-      return bcrypt
-        .hash(req.body.password, 12)
+      return bcrypt.hash(req.body.password, 12)
         .then(hashedPassword => {
           const user = new User({
             email: email,
@@ -80,8 +80,16 @@ exports.postSignup = (req, res, next) => {
           return user.save();
         })
         .then(result => {
-          console.log('User created');
           res.redirect('/login');
+          return transporter.sendMail({
+            to: email,
+            from: 'shop@node-complete.com',
+            subject: 'Signup succeeded!',
+            html: '<h1>You successfully signed up!</h1>'
+          });
+        })
+        .catch(err => {
+          console.log(err);
         });
     })
     .catch(err => {
