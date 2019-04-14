@@ -28,7 +28,6 @@ exports.getSignup = (req, res, next) => {
 };
 
 exports.postLogin = (req, res, next) => {
-
   User.findOne({ email: req.body.email })
     .then(user => {
       if (!user) {
@@ -42,12 +41,10 @@ exports.postLogin = (req, res, next) => {
             req.session.isLoggedIn = true;
             req.session.user = user;
             return req.session.save(err => {
-              console.log(err);
+              if (err) throw new Error(err);
               res.redirect('/');
             });
           }
-          req.flash('error', 'Invalid email or password.');
-          res.redirect('/login');
         })
         .catch(err => {
           console.log(err);
@@ -91,7 +88,7 @@ exports.postSignup = async (req, res, next) => {
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy(err => {
-    console.log(err);
+    if(err) console.log(err);
     res.redirect('/');
   });
 };
@@ -173,6 +170,6 @@ exports.postNewPassword = async (req, res, next) => {
     await user.save();
     res.redirect('/login');
   } catch (error) {
-    console.log(err);
+    console.log(error);
   }
 };
