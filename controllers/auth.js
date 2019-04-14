@@ -7,7 +7,7 @@ const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
   let message = req.flash('error');
-  message = message.length > 0 ?  message[0] : null ;
+  message = message.length > 0 ? message[0] : null;
 
   res.render('auth/login', {
     path: '/login',
@@ -18,7 +18,7 @@ exports.getLogin = (req, res, next) => {
 
 exports.getSignup = (req, res, next) => {
   let message = req.flash('error');
-  message = message.length > 0 ?  message[0] : null ;
+  message = message.length > 0 ? message[0] : null;
 
   res.render('auth/signup', {
     path: '/signup',
@@ -78,7 +78,7 @@ exports.postSignup = async (req, res, next) => {
         .then(result => {
           console.log("User created");
           res.redirect('/login');
-          return mailTransporter.sendMail( emailMessages.createdUser(email) );
+          return mailTransporter.sendMail(emailMessages.createdUser(email));
         })
         .catch(err => {
           console.log(err);
@@ -98,7 +98,7 @@ exports.postLogout = (req, res, next) => {
 
 exports.getReset = (req, res, next) => {
   let message = req.flash('error');
-  message = message.length > 0 ?  message[0] : null ;
+  message = message.length > 0 ? message[0] : null;
 
   res.render('auth/reset', {
     path: '/reset',
@@ -108,13 +108,14 @@ exports.getReset = (req, res, next) => {
 };
 
 exports.postReset = (req, res, next) => {
+  const email = req.body.email;
   crypto.randomBytes(32, (err, buffer) => {
     if (err) {
-      console.log(err);
+      req.flash('error', 'Server error, Try it again');
       return res.redirect('/reset');
     }
     const token = buffer.toString('hex');
-    User.findOne({ email: req.body.email })
+    User.findOne({ email: email })
       .then(user => {
         if (!user) {
           req.flash('error', 'No account with that email found.');
@@ -126,7 +127,7 @@ exports.postReset = (req, res, next) => {
       })
       .then(result => {
         res.redirect('/');
-        mailTransporter.sendMail( emailMessages.newPasswordRequest(req.body.email, token) );
+        mailTransporter.sendMail(emailMessages.newPasswordRequest(email, token));
       })
       .catch(err => {
         console.log(err);
@@ -135,7 +136,27 @@ exports.postReset = (req, res, next) => {
 };
 
 exports.getNewPassword = (req, res, next) => {
+  const token = req.params.token;
+  User.findOne({ resetToken: token, resetTokenExpiration: { $gt: Date.now() } })
+    .then(user => {
+      if (!user) {
+        req.flash('error', 'An error has occurred, Please ask for a new link') 
+        res.redirect('/reset');
+      }
+      let message = req.flash('error');
+      message = message.length > 0 ? message[0] : null;
 
+      res.render('auth/new-password', {
+        path: '/new-password',
+        pageTitle: 'New Password',
+        errorMessage: message,
+        userId: user._id.toString(),
+        passwordToken: token
+      });
+    })
+    .catch(err => {
+      console.log(err);
+    });
 };
 
 exports.postNewPassword = (req, res, next) => {
