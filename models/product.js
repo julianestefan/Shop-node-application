@@ -26,4 +26,12 @@ const productSchema = new Schema({
   }
 });
 
+productSchema.methods.updateProductWithRequestData = function (req) {
+  this.title = req.body.title;
+  this.price = req.body.price;
+  this.description = req.body.description;
+  this.imageUrl = req.body.imageUrl;
+  return this.save();
+}
+
 module.exports = mongoose.model('Product', productSchema);

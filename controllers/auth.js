@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const {validationResult} = require('express-validator/check');
 
 const mailTransporter = require('../config/mail');
-const emailMessages = require('../util/emails');
+const emailMessages = require('../utils/emails');
 const User = require('../models/user');
 
 exports.getLogin = (req, res, next) => {
