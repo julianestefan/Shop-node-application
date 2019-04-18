@@ -76,4 +76,11 @@ userSchema.methods.clearCart = function() {
   return this.save();
 };
 
+userSchema.methods.resetPassword = function(newPassword) {
+  this.password = newPassword;
+  this.resetToken = null;
+  this.resetTokenExpiration = null;
+  return this.save();
+}
+
 module.exports = mongoose.model('User', userSchema);
