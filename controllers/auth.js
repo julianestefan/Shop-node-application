@@ -21,20 +21,17 @@ exports.getSignup = (req, res, next) => {
 exports.postLogin = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(422).render('auth/login', views.login(errors.array()[0].msg, email, password, errors.array()))
+  const {isEmpty: errorsEmpty , array: errors } = validationResult(req);
+  if (!errorsEmpty()) return res.status(422).render('auth/login', views.login(errors()[0].msg, email, password, errors() ));
 
   try {
     const user = await User.findOne({ email: email });
-    if (!user) return res.status(422).render('auth/login', views.login('Invalid email', email, password))
+    if (!user) return res.status(422).render('auth/login', views.login('Invalid email', email, password));
     const match = await bcrypt.compare(password, user.password);
     if (match) {
       req.session.isLoggedIn = true;
       req.session.user = user;
-      return req.session.save(error => {
-        if (error) return res.status(500).render('auth/login', views.login(error.toString(), email, password));
-        res.redirect('/');
-      });
+      return res.redirect('/');
     }
     res.status(422).render('auth/login', views.login('Invalid password', email, password));
   } catch (error) {
@@ -44,15 +41,14 @@ exports.postLogin = async (req, res, next) => {
 };
 
 exports.postSignup = async (req, res, next) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(422).render('auth/signup', views.signUp(errors.array()[0].msg, email, password, req.body.confirmPassword, errors.array()))
+  const {isEmpty: errorsEmpty , array: errors } = validationResult(req);
+  if (!errorsEmpty()) return res.status(422).render('auth/signup',
+    views.signUp(errors()[0].msg, req.body.email, req.body.password, req.body.confirmPassword, errors()));
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(req.body.password, 12);
     const user = new User({
-      email: email,
+      email: req.body.email,
       password: hashedPassword,
       cart: { items: [] }
     });
@@ -90,9 +86,7 @@ exports.postReset = (req, res, next) => {
         req.flash('error', 'No account with that email found.');
         return res.redirect('/reset');
       }
-      user.resetToken = token;
-      user.resetTokenExpiration = Date.now() + 3600000;
-      await user.save();
+      await user.setResetToken(token);
       res.redirect('/');
       await mailTransporter.sendMail(emailMessages.newPasswordRequest(req.body.email, token));
       console.log('Mail sended')

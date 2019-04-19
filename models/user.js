@@ -83,4 +83,10 @@ userSchema.methods.resetPassword = function(newPassword) {
   return this.save();
 }
 
+userSchema.methods.setResetToken = function(token) {
+  this.resetToken = token;
+  this.resetTokenExpiration = Date.now() + 3600000;
+  return this.save();
+}
+
 module.exports = mongoose.model('User', userSchema);
