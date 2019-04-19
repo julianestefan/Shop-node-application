@@ -9,8 +9,10 @@ exports.getProducts = async (req, res, next) => {
   try {
     const products = await Product.find();
     res.render('admin/products', views.products(products));
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
   }
 };
 
@@ -28,8 +30,10 @@ exports.postAddProduct = async (req, res, next) => {
     await product.save();
     console.log('Product Created');
     res.redirect('/admin/products');
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
   }
 };
 
@@ -39,7 +43,10 @@ exports.getEditProduct = async (req, res, next) => {
     const product = await Product.findById(req.params.productId);
     if (!product) return res.redirect('/');
     res.render('admin/add-product', views.addProduct(product, true))
-  } catch (error) {
+  } catch (err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
   }
 };
 
@@ -51,18 +58,22 @@ exports.postEditProduct = async (req, res, next) => {
     await product.updateProductWithRequestData(req);
     console.log('Product updated');
     res.redirect('/admin/products');
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
   }
 };
 
 exports.postDeleteProduct = async (req, res, next) => {
-  try{
+  try {
     await Product.findByIdAndRemove(req.body.productId);
     console.log('Product deleted');
     res.redirect('/admin/products');
-  }catch(error){
-    console.log(error);
+  } catch (err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
   }
 };
 

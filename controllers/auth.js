@@ -21,8 +21,8 @@ exports.getSignup = (req, res, next) => {
 exports.postLogin = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
-  const {isEmpty: errorsEmpty , array: errors } = validationResult(req);
-  if (!errorsEmpty()) return res.status(422).render('auth/login', views.login(errors()[0].msg, email, password, errors() ));
+  const { isEmpty: errorsEmpty, array: errors } = validationResult(req);
+  if (!errorsEmpty()) return res.status(422).render('auth/login', views.login(errors()[0].msg, email, password, errors()));
 
   try {
     const user = await User.findOne({ email: email });
@@ -34,14 +34,15 @@ exports.postLogin = async (req, res, next) => {
       return res.redirect('/');
     }
     res.status(422).render('auth/login', views.login('Invalid password', email, password));
-  } catch (error) {
-    console.log(error)
+  } catch (err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
   }
-
 };
 
 exports.postSignup = async (req, res, next) => {
-  const {isEmpty: errorsEmpty , array: errors } = validationResult(req);
+  const { isEmpty: errorsEmpty, array: errors } = validationResult(req);
   if (!errorsEmpty()) return res.status(422).render('auth/signup',
     views.signUp(errors()[0].msg, req.body.email, req.body.password, req.body.confirmPassword, errors()));
 
@@ -56,8 +57,10 @@ exports.postSignup = async (req, res, next) => {
     res.redirect('/login');
     await mailTransporter.sendMail(emailMessages.successfullSignUp(email));
     console.log('Mail sended')
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
   }
 };
 
@@ -90,8 +93,10 @@ exports.postReset = (req, res, next) => {
       res.redirect('/');
       await mailTransporter.sendMail(emailMessages.newPasswordRequest(req.body.email, token));
       console.log('Mail sended')
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     }
   });
 };
@@ -106,8 +111,10 @@ exports.getNewPassword = async (req, res, next) => {
     }
     const message = req.flash('error').length > 0 ? req.flash('error')[0] : null;
     res.render('auth/new-password', views.newPassword(message, user, token));
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
   }
 };
 
@@ -121,7 +128,9 @@ exports.postNewPassword = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 12);
     await user.resetPassword(hashedPassword);
     res.redirect('/login');
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
   }
 };

@@ -4,29 +4,35 @@ const Order = require('../models/order');
 const views = require('../views/shop/viewsObjects');
 
 exports.getIndex = async (req, res, next) => {
-    try{
+    try {
         const products = await Product.find();
         res.render('shop/product-list', views.products(products));
-    }catch (error) {
-        console.log(error);
+    } catch (err) {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
 exports.getProducts = async (req, res, next) => {
-    try{
+    try {
         const products = await Product.find();
         res.render('shop/product-list', views.products(products, '/products'));
-    }catch (error) {
-        console.log(error);
+    } catch (err) {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
 exports.getProduct = async (req, res, next) => {
-    try{
+    try {
         const product = await Product.findById(req.params.id);
-        res.render('shop/product-detail', views.product(product) );
-    }catch(error){
-        console.log(error);
+        res.render('shop/product-detail', views.product(product));
+    } catch (err) {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -35,8 +41,10 @@ exports.getCart = async (req, res, next) => {
         const user = await req.user.populate('cart.items.productId').execPopulate();
         const products = await user.cart.items;
         res.render('shop/cart', views.cart(products));
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -45,8 +53,10 @@ exports.postCart = async (req, res, next) => {
         const product = await Product.findById(req.body.productId);
         await req.user.addToCart(product);
         res.redirect('/cart');
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -54,8 +64,10 @@ exports.postCartDeleteProduct = async (req, res, next) => {
     try {
         await req.user.removeOneFromCart(req.body.productId);
         res.redirect('/cart');
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -63,8 +75,10 @@ exports.postCartDeleteAllProducts = async (req, res, next) => {
     try {
         await req.user.removeAllFromCart(req.body.productId);
         res.redirect('/cart');
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -79,8 +93,10 @@ exports.postOrder = async (req, res, next) => {
         await order.save();
         await req.user.clearCart();
         res.redirect('/orders');
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
@@ -88,8 +104,10 @@ exports.getOrders = async (req, res, next) => {
     try {
         const orders = await Order.find({ 'user.userId': req.user._id })
         res.render('shop/orders', views.orders(orders));
-    } catch (error) {
-        console.log(error)
+    } catch (err) {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
     }
 };
 
