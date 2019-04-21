@@ -21,10 +21,10 @@ exports.getAddProduct = (req, res, next) => {
 };
 
 exports.postAddProduct = async (req, res, next) => {
-  const errors = validationResult(req);
   const reqProduct = extractProductFromRequest(req);
+  if (!req.file) return res.status(422).render('admin/edit-product', views.addProduct(reqProduct, false, true, 'Attached files is not an image'));
+  const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(422).render('admin/add-product', views.addProduct(reqProduct, false, true, errors.array()[0].msg, errors.array()));
-
   const product = new Product({ ...reqProduct, userId: req.user });
   try {
     await product.save();
