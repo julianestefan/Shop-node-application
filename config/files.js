@@ -1,5 +1,11 @@
 const multer = require('multer');
 
+const FILE_TYPES = [
+    'image/jpg',
+    'image/jpeg',
+    'image/png'
+]
+
 /**
 * Set configuration to manage files  
 * @param {String[]} filesTypes- The file types allowed to recieve by the app. 
@@ -14,20 +20,9 @@ module.exports = (app) => {
             cb(null, Date.now() + '-' + file.originalname)
         }
     })
-    /*     const fileFilter = (req, file, cb) => {
-            filesTypes.includes(file.mimetype) ? cb(null, true) : cb(null, false);
-        }; */
 
     const fileFilter = (req, file, cb) => {
-        if (
-            file.mimetype === 'image/png' ||
-            file.mimetype === 'image/jpg' ||
-            file.mimetype === 'image/jpeg'
-        ) {
-            cb(null, true);
-        } else {
-            cb(null, false);
-        }
+        FILE_TYPES.includes(file.mimetype) ? cb(null, true) : cb(null, false);
     };
 
     app.use(multer({ storage: storage, fileFilter: fileFilter }).single('image'));

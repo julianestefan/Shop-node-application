@@ -4,6 +4,7 @@ const { validationResult } = require('express-validator/check');
 const Product = require('../models/product');
 const views = require('../views/admin/viewsObjects');
 const { extractProductFromRequest } = require('../utils/helpers');
+const {deleteFile} = require('../utils/helpers');
 
 exports.getProducts = async (req, res, next) => {
   try {
@@ -67,7 +68,8 @@ exports.postEditProduct = async (req, res, next) => {
 
 exports.postDeleteProduct = async (req, res, next) => {
   try {
-    await Product.findByIdAndRemove(req.body.productId);
+    const product = await Product.findByIdAndRemove(req.body.productId);
+    deleteFile(product.imageUrl);
     console.log('Product deleted');
     res.redirect('/admin/products');
   } catch (err) {
