@@ -42,6 +42,7 @@ exports.getEditProduct = async (req, res, next) => {
   if (!req.query.edit) return res.redirect('/');
   try {
     const product = await Product.findById(req.params.productId);
+    console.log(product.title )
     if (!product) return res.redirect('/');
     res.render('admin/add-product', views.addProduct(product, true))
   } catch (err) {
@@ -55,8 +56,10 @@ exports.postEditProduct = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(422).render('admin/add-product', views.addProduct(extractProductFromRequest(req), true, true, errors.array()[0].msg, errors.array()));
   try {
-    const product = Product.findById(req.body.productId);
+    const product = await Product.findById(req.body.productId);
+    const oldeImage =product.imageUrl;
     await product.updateProductWithRequestData(req);
+    deleteFile(oldeImage);
     console.log('Product updated');
     res.redirect('/admin/products');
   } catch (err) {

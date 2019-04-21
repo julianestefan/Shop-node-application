@@ -30,7 +30,7 @@ productSchema.methods.updateProductWithRequestData = function (req) {
   this.title = req.body.title;
   this.price = req.body.price;
   this.description = req.body.description;
-  this.imageUrl = req.body.imageUrl;
+  if(req.file) this.imageUrl = req.file.path;
   return this.save();
 }
 
