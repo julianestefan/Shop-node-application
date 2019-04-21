@@ -2,6 +2,7 @@
 const Product = require('../models/product');
 const Order = require('../models/order');
 const views = require('../views/shop/viewsObjects');
+const invoicePdf = require('../utils/pdf'); 
 
 exports.getIndex = async (req, res, next) => {
     try {
@@ -104,6 +105,19 @@ exports.getOrders = async (req, res, next) => {
     try {
         const orders = await Order.find({ 'user.userId': req.user._id })
         res.render('shop/orders', views.orders(orders));
+    } catch (err) {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+    }
+};
+
+exports.getInvoice = async (req, res, next) => {
+    try {
+        const order = await Order.findById(req.params.orderId);
+        if (!order) return next(new Error('No order found.'));
+        if (order.user.userId.toString() !== req.user._id.toString()) return next(new Error('Unauthorized'));
+        await invoicePdf(res, order );
     } catch (err) {
         const error = new Error(err);
         error.httpStatusCode = 500;

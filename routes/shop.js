@@ -11,6 +11,7 @@ router.post('/cart', isauth, shopController.postCart);
 router.post('/cart-delete-item', isauth, shopController.postCartDeleteProduct);
 router.post('/cart-delete-all', isauth, shopController.postCartDeleteAllProducts); 
 router.get('/orders', isauth, shopController.getOrders);
+router.get('/orders/:orderId', isauth, shopController.getInvoice);
 router.post('/create-order', isauth, shopController.postOrder);
 
 module.exports = router;

@@ -4,7 +4,7 @@ const { validationResult } = require('express-validator/check');
 const Product = require('../models/product');
 const views = require('../views/admin/viewsObjects');
 const { extractProductFromRequest } = require('../utils/helpers');
-const {deleteFile} = require('../utils/helpers');
+const { deleteFile } = require('../utils/helpers');
 
 exports.getProducts = async (req, res, next) => {
   try {
@@ -42,7 +42,6 @@ exports.getEditProduct = async (req, res, next) => {
   if (!req.query.edit) return res.redirect('/');
   try {
     const product = await Product.findById(req.params.productId);
-    console.log(product.title )
     if (!product) return res.redirect('/');
     res.render('admin/add-product', views.addProduct(product, true))
   } catch (err) {
@@ -57,9 +56,9 @@ exports.postEditProduct = async (req, res, next) => {
   if (!errors.isEmpty()) return res.status(422).render('admin/add-product', views.addProduct(extractProductFromRequest(req), true, true, errors.array()[0].msg, errors.array()));
   try {
     const product = await Product.findById(req.body.productId);
-    const oldeImage =product.imageUrl;
+    const oldImage = product.imageUrl;
     await product.updateProductWithRequestData(req);
-    deleteFile(oldeImage);
+    deleteFile(oldImage);
     console.log('Product updated');
     res.redirect('/admin/products');
   } catch (err) {
