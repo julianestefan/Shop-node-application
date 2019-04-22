@@ -39,7 +39,7 @@ exports.getProduct = async (req, res, next) => {
 
 exports.getCart = async (req, res, next) => {
     try {
-        const user = await req.user.populate('cart.items.productId').execPopulate();
+        const user = await req.user.clearDeletedItemsfromCart();
         const products = await user.cart.items;
         res.render('shop/cart', views.cart(products));
     } catch (err) {

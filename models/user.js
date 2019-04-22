@@ -71,6 +71,18 @@ userSchema.methods.removeAllFromCart = function (productId) {
   return this.save();
 };
 
+userSchema.methods.clearDeletedItemsfromCart = async function() {
+  try{
+    await this.populate('cart.items.productId').execPopulate();
+    this.cart = { items: this.cart.items.filter(item => item.productId !== null) };
+    return this.save();
+  }catch(err){
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    throw error;
+  }
+};
+
 userSchema.methods.clearCart = function() {
   this.cart = { items: [] };
   return this.save();
