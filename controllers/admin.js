@@ -58,7 +58,7 @@ exports.postEditProduct = async (req, res, next) => {
     const product = await Product.findById(req.body.productId);
     const oldImage = product.imageUrl;
     await product.updateProductWithRequestData(req);
-    deleteFile(oldImage);
+    if (oldImage !== product.imageUrl ) deleteFile(oldImage);
     console.log('Product updated');
     res.redirect('/admin/products');
   } catch (err) {
