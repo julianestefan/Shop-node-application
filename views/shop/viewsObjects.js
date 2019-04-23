@@ -9,14 +9,23 @@ module.exports = {
         pageTitle: 'Your Cart',
         products: products
     }),
-    products: (products, path = '/') => ({
-        path: path,
-        pageTitle: 'All Products',
-        products: products
-    }),
+    products: (paginationData, page, path = '/') => {
+        const [products, totalItems, ITEMS_PER_PAGE] = paginationData;
+        return {
+            path: path,
+            pageTitle: 'All Products',
+            products: products,
+            currentPage: page,
+            hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page - 1,
+            lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE)
+        }
+    },
     product: product => ({
         path: 'products',
-        pageTitle: product.title ,
+        pageTitle: product.title,
         product: product
     })
 }

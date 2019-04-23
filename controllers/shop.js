@@ -2,12 +2,15 @@
 const Product = require('../models/product');
 const Order = require('../models/order');
 const views = require('../views/shop/viewsObjects');
-const invoicePdf = require('../utils/pdf'); 
+const invoicePdf = require('../utils/pdf');
+const pagination = require('../utils/pagination');
 
 exports.getIndex = async (req, res, next) => {
+    const page = +req.query.page || 1;
     try {
-        const products = await Product.find();
-        res.render('shop/product-list', views.products(products));
+        const paginationData = await pagination(page, Product);
+        console.log(paginationData);
+        res.render('shop/product-list', views.products(paginationData, page));
     } catch (err) {
         const error = new Error(err);
         error.httpStatusCode = 500;
@@ -16,9 +19,10 @@ exports.getIndex = async (req, res, next) => {
 };
 
 exports.getProducts = async (req, res, next) => {
+    const page = +req.query.page || 1;
     try {
-        const products = await Product.find();
-        res.render('shop/product-list', views.products(products, '/products'));
+        const paginationData = await pagination(page, Product);
+        res.render('shop/product-list', views.products(paginationData, page, '/products'));
     } catch (err) {
         const error = new Error(err);
         error.httpStatusCode = 500;
@@ -116,7 +120,7 @@ exports.getInvoice = async (req, res, next) => {
         const order = await Order.findById(req.params.orderId);
         if (!order) return next(new Error('No order found.'));
         if (order.user.userId.toString() !== req.user._id.toString()) return next(new Error('Unauthorized'));
-        await invoicePdf(res, order );
+        await invoicePdf(res, order);
     } catch (err) {
         const error = new Error(err);
         error.httpStatusCode = 500;
