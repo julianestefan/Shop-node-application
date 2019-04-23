@@ -1,11 +1,14 @@
 "use strict";
-
 const shopRoutes = require('./shop');
 const adminRoutes = require('./admin');
 const authRoutes = require('./auth');
 const errorController = require('../controllers/error');
+const isAuth = require('../middleware/isAuth');
+const shopController = require('../controllers/shop');
 
 const configureRoutes = (app) => {
+    app.post('/create-order', isAuth, shopController.postOrder);
+    require('../config/csrf')(app);
     app.use('/admin', adminRoutes);
     app.use(shopRoutes);
     app.use(authRoutes);

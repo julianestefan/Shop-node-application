@@ -1,7 +1,7 @@
 .cart-list{
     list-style: none;
     margin: 0 auto;
-    width: 40%;
+    width: 60%;
 }
 
 .cart-list li {
@@ -14,9 +14,24 @@
 }
 
 .cart-list p {
+    font-weight: bold;
     margin-right: auto;
 }
 
 .cart-list form {
     margin-right: 5px;
+}
+
+.cart-list .item-detail {
+    margin: 0 5px;
+    font-size: 13px;
+}
+
+.cart-list .item-detail:last-of-type {
+    font-weight: bold;
+}
+
+.cart-list img {
+    margin-right: 10px;
+    width: 35px;
 }

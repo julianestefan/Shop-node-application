@@ -85,6 +85,18 @@ exports.postCartDeleteAllProducts = async (req, res, next) => {
     }
 };
 
+exports.getCheckout = async (req, res, next) => {
+    try {
+        const user = await req.user.populate('cart.items.productId').execPopulate();
+        res.render('shop/checkout', views.checkout(user.cart.items));
+    } catch (err) {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+    }
+};
+
+
 exports.postOrder = async (req, res, next) => {
     try {
         const user = await req.user.populate('cart.items.productId').execPopulate();

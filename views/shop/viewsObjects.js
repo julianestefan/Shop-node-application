@@ -1,4 +1,16 @@
 module.exports = {
+    checkout: products => {
+        let total = 0;
+        products.forEach(p => {
+            total += p.quantity * p.productId.price;
+        });
+        return {
+            path: '/checkout',
+            pageTitle: 'Checkout',
+            products: products,
+            totalSum: total
+        };
+    },
     orders: orders => ({
         path: '/orders',
         pageTitle: 'Your Orders',

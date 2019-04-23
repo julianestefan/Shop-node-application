@@ -30,7 +30,8 @@
     "nodemailer": "^6.1.0",
     "nodemailer-sendgrid-transport": "^0.2.0",
     "pdfkit": "^0.9.0",
-    "save": "^2.3.3"
+    "save": "^2.3.3",
+    "stripe": "^6.30.0"
   },
   "devDependencies": {
     "nodemon": "^1.18.10"
