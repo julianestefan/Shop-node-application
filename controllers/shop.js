@@ -40,8 +40,7 @@ exports.getProduct = async (req, res, next) => {
 exports.getCart = async (req, res, next) => {
     try {
         const user = await req.user.clearDeletedItemsfromCart();
-        const products = await user.cart.items;
-        res.render('shop/cart', views.cart(products));
+        res.render('shop/cart', views.cart(user.cart.items));
     } catch (err) {
         const error = new Error(err);
         error.httpStatusCode = 500;
