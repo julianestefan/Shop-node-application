@@ -68,12 +68,15 @@ exports.postEditProduct = async (req, res, next) => {
   }
 };
 
-exports.postDeleteProduct = async (req, res, next) => {
+exports.deleteProduct = async (req, res, next) => {
+  const productId = req.params.productId;
   try {
-    const product = await Product.findByIdAndRemove(req.body.productId);
+    const product = await Product.findById(productId);
+    if (!product) return next(new Error('Product not found.'));
+    await Product.deleteOne({ _id: productId, userId: req.user._id })
     deleteFile(product.imageUrl);
     console.log('Product deleted');
-    res.redirect('/admin/products');
+    res.status(200).json({ message: 'Success!' });
   } catch (err) {
     const error = new Error(err);
     error.httpStatusCode = 500;

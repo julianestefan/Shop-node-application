@@ -9,7 +9,6 @@ exports.getIndex = async (req, res, next) => {
     const page = +req.query.page || 1;
     try {
         const paginationData = await pagination(page, Product);
-        console.log(paginationData);
         res.render('shop/product-list', views.products(paginationData, page));
     } catch (err) {
         const error = new Error(err);
