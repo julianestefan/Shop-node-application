@@ -1,16 +1,16 @@
 "use strict";
 const Product = require('../models/product');
 const Order = require('../models/order');
-const views = require('../views/shop/viewsObjects');
-const invoicePdf = require('../utils/pdf');
-const pagination = require('../utils/pagination');
-const stripe = require('stripe')(process.env.STRIPE_APIKEY);
+const {shopViews} = require('../utils/views');
+const invoicePdf = require('../services/pdf');
+const pagination = require('../services/pagination');
+const payments = require('../services/payments');
 
 exports.getIndex = async (req, res, next) => {
     const page = +req.query.page || 1;
     try {
         const paginationData = await pagination(page, Product);
-        res.render('shop/product-list', views.products(paginationData, page));
+        res.render('shop/product-list', shopViews.products(paginationData, page));
     } catch (err) {
         const error = new Error(err);
         error.httpStatusCode = 500;
@@ -22,7 +22,7 @@ exports.getProducts = async (req, res, next) => {
     const page = +req.query.page || 1;
     try {
         const paginationData = await pagination(page, Product);
-        res.render('shop/product-list', views.products(paginationData, page, '/products'));
+        res.render('shop/product-list', shopViews.products(paginationData, page, '/products'));
     } catch (err) {
         const error = new Error(err);
         error.httpStatusCode = 500;
@@ -33,7 +33,7 @@ exports.getProducts = async (req, res, next) => {
 exports.getProduct = async (req, res, next) => {
     try {
         const product = await Product.findById(req.params.id);
-        res.render('shop/product-detail', views.product(product));
+        res.render('shop/product-detail', shopViews.product(product));
     } catch (err) {
         const error = new Error(err);
         error.httpStatusCode = 500;
@@ -44,7 +44,7 @@ exports.getProduct = async (req, res, next) => {
 exports.getCart = async (req, res, next) => {
     try {
         const user = await req.user.clearDeletedItemsfromCart();
-        res.render('shop/cart', views.cart(user.cart.items));
+        res.render('shop/cart', shopViews.cart(user.cart.items));
     } catch (err) {
         const error = new Error(err);
         error.httpStatusCode = 500;
@@ -89,7 +89,7 @@ exports.postCartDeleteAllProducts = async (req, res, next) => {
 exports.getCheckout = async (req, res, next) => {
     try {
         const user = await req.user.populate('cart.items.productId').execPopulate();
-        res.render('shop/checkout', views.checkout(user.cart.items));
+        res.render('shop/checkout', shopViews.checkout(user.cart.items));
     } catch (err) {
         const error = new Error(err);
         error.httpStatusCode = 500;
@@ -99,28 +99,15 @@ exports.getCheckout = async (req, res, next) => {
 
 
 exports.postOrder = async (req, res, next) => {
-    let totalSum = 0;
     try {
         const user = await req.user.populate('cart.items.productId').execPopulate();
-        user.cart.items.forEach(p => {
-            totalSum += p.quantity * p.productId.price;
-            console.log(p.productId.price);
-            console.log(p.quantity);
-            console.log(totalSum);
-        });
         const products = user.cart.items.map(i => ({
             quantity: i.quantity,
             product: { ...i.productId._doc }
         }));
         const order = new Order({ user: { email: req.user.email, userId: req.user }, products: products });
         const result = await order.save();;
-        await stripe.charges.create({
-            amount: totalSum * 100,
-            currency: 'usd',
-            description: 'Demo Order',
-            source: req.body.stripeToken,
-            metadata: { order_id: result._id.toString() }
-        });
+        payments(req.body.stripeToken, order )
         await req.user.clearCart();
         res.redirect('/orders');
     } catch (err) {
@@ -133,7 +120,7 @@ exports.postOrder = async (req, res, next) => {
 exports.getOrders = async (req, res, next) => {
     try {
         const orders = await Order.find({ 'user.userId': req.user._id })
-        res.render('shop/orders', views.orders(orders));
+        res.render('shop/orders', shopViews.orders(orders));
     } catch (err) {
         const error = new Error(err);
         error.httpStatusCode = 500;

@@ -4,36 +4,36 @@ const crypto = require('crypto');
 const { validationResult } = require('express-validator/check');
 
 const User = require('../models/user');
-const mailTransporter = require('../config/mail');
+const mailTransporter = require('../services/email');
 const emailMessages = require('../utils/emails');
-const views = require('../views/auth/viejsObject');
+const {authViews} = require('../utils/views');
 
 exports.getLogin = (req, res, next) => {
   const message = req.flash('error').length > 0 ? req.flash('error')[0] : null;
-  res.render('auth/login', views.login(message));
+  res.render('auth/login', authViews.login(message));
 };
 
 exports.getSignup = (req, res, next) => {
   const message = req.flash('error').length > 0 ? req.flash('error')[0] : null;
-  res.render('auth/signup', views.signUp(message));
+  res.render('auth/signup', authViews.signUp(message));
 };
 
 exports.postLogin = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const { isEmpty: errorsEmpty, array: errors } = validationResult(req);
-  if (!errorsEmpty()) return res.status(422).render('auth/login', views.login(errors()[0].msg, email, password, errors()));
+  if (!errorsEmpty()) return res.status(422).render('auth/login', authViews.login(errors()[0].msg, email, password, errors()));
 
   try {
     const user = await User.findOne({ email: email });
-    if (!user) return res.status(422).render('auth/login', views.login('Invalid email', email, password));
+    if (!user) return res.status(422).render('auth/login', authViews.login('Invalid email', email, password));
     const match = await bcrypt.compare(password, user.password);
     if (match) {
       req.session.isLoggedIn = true;
       req.session.user = user;
       return res.redirect('/');
     }
-    res.status(422).render('auth/login', views.login('Invalid password', email, password));
+    res.status(422).render('auth/login', authViews.login('Invalid password', email, password));
   } catch (err) {
     const error = new Error(err);
     error.httpStatusCode = 500;
@@ -44,7 +44,7 @@ exports.postLogin = async (req, res, next) => {
 exports.postSignup = async (req, res, next) => {
   const { isEmpty: errorsEmpty, array: errors } = validationResult(req);
   if (!errorsEmpty()) return res.status(422).render('auth/signup',
-    views.signUp(errors()[0].msg, req.body.email, req.body.password, req.body.confirmPassword, errors()));
+    authViews.signUp(errors()[0].msg, req.body.email, req.body.password, req.body.confirmPassword, errors()));
 
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 12);
@@ -73,7 +73,7 @@ exports.postLogout = (req, res, next) => {
 
 exports.getReset = (req, res, next) => {
   const message = req.flash('error').length > 0 ? req.flash('error')[0] : null;
-  res.render('auth/reset', views.resetPassword(message));
+  res.render('auth/reset', authViews.resetPassword(message));
 };
 
 exports.postReset = (req, res, next) => {
@@ -110,7 +110,7 @@ exports.getNewPassword = async (req, res, next) => {
       res.redirect('/reset');
     }
     const message = req.flash('error').length > 0 ? req.flash('error')[0] : null;
-    res.render('auth/new-password', views.newPassword(message, user, token));
+    res.render('auth/new-password', authViews.newPassword(message, user, token));
   } catch (err) {
     const error = new Error(err);
     error.httpStatusCode = 500;

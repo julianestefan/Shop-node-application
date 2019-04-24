@@ -1,7 +1,7 @@
 const router = require('express').Router();
 
 const shopController = require('../controllers/shop');
-const isAuth = require('../middleware/isAuth');
+const {isAuth} = require('../utils/middleware');
 
 router.get('/', shopController.getIndex);
 router.get('/products', shopController.getProducts);

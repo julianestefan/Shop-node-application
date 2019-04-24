@@ -1,7 +1,20 @@
 const { check, body } = require('express-validator/check');
-const User = require('../../models/user');
+const User = require('../models/user');
 
-module.exports = {
+exports.adminRules = {
+    product: [
+        body('title')
+            .isString()
+            .isLength({ min: 3 })
+            .trim(),
+        body('price').isFloat(),
+        body('description')
+            .isLength({ min: 5, max: 400 })
+            .trim()
+    ]
+}
+
+exports.authRules = {
     signUp: [
         check('email')
             .isEmail()
