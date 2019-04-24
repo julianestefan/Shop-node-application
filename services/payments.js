@@ -1,8 +1,8 @@
 const stripe = require('stripe')(process.env.STRIPE_APIKEY);
 
-module.exports = (token, order) => {
+module.exports = (token, order, products) => {
     let totalSum = 0;
-    order.products.forEach(p => {
+    products.forEach(p => {
         totalSum += p.quantity * p.productId.price;
     });
 

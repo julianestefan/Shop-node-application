@@ -97,7 +97,6 @@ exports.getCheckout = async (req, res, next) => {
     }
 };
 
-
 exports.postOrder = async (req, res, next) => {
     try {
         const user = await req.user.populate('cart.items.productId').execPopulate();
@@ -106,8 +105,8 @@ exports.postOrder = async (req, res, next) => {
             product: { ...i.productId._doc }
         }));
         const order = new Order({ user: { email: req.user.email, userId: req.user }, products: products });
-        const result = await order.save();;
-        payments(req.body.stripeToken, order )
+        await order.save();
+        await payments(req.body.stripeToken, order, user.cart.items );
         await req.user.clearCart();
         res.redirect('/orders');
     } catch (err) {
