@@ -4,6 +4,7 @@ const Order = require('../models/order');
 const views = require('../views/shop/viewsObjects');
 const invoicePdf = require('../utils/pdf');
 const pagination = require('../utils/pagination');
+const stripe = require('stripe')(process.env.STRIPE_APIKEY);
 
 exports.getIndex = async (req, res, next) => {
     const page = +req.query.page || 1;
@@ -98,14 +99,28 @@ exports.getCheckout = async (req, res, next) => {
 
 
 exports.postOrder = async (req, res, next) => {
+    let totalSum = 0;
     try {
         const user = await req.user.populate('cart.items.productId').execPopulate();
+        user.cart.items.forEach(p => {
+            totalSum += p.quantity * p.productId.price;
+            console.log(p.productId.price);
+            console.log(p.quantity);
+            console.log(totalSum);
+        });
         const products = user.cart.items.map(i => ({
             quantity: i.quantity,
             product: { ...i.productId._doc }
         }));
         const order = new Order({ user: { email: req.user.email, userId: req.user }, products: products });
-        await order.save();
+        const result = await order.save();;
+        await stripe.charges.create({
+            amount: totalSum * 100,
+            currency: 'usd',
+            description: 'Demo Order',
+            source: req.body.stripeToken,
+            metadata: { order_id: result._id.toString() }
+        });
         await req.user.clearCart();
         res.redirect('/orders');
     } catch (err) {

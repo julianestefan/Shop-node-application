@@ -5,8 +5,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const User = require('../models/user');
 
 const configureSessions = (app) => {
-  const uri = "mongodb+srv://" + process.env.MONGO_USER + ":" + process.env.MONGO_PASSWORD + "@" + process.env.MONGO_HOST + "?retryWrites=true";
-  const store = new MongoDBStore({ uri: uri, collection: 'sessions' });
+  const store = new MongoDBStore({ uri: process.env.MONGODB_URI, collection: 'sessions' });
 
   app.use(session({
     secret: 'my secret',

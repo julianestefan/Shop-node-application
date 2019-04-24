@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 
 const connectDB = (callback) => {
-    const uri = "mongodb+srv://" + process.env.MONGO_USER + ":" + process.env.MONGO_PASSWORD + "@" + process.env.MONGO_HOST + "?retryWrites=true";
+    const uri = process.env.MONGODB_URI;
 
     mongoose.connect(uri, { useNewUrlParser: true })
         .then(client => {
